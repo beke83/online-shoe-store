@@ -1,0 +1,7 @@
+create strapi with it commands
+installed cloudinary
+added cloudinary to strapi
+create plugin.js file under config for the strapi cloudinary
+in middleware.js file under config for the folder change 'strapi:security' to allos strpi admin sccess the upload on cloudinary
+Add cloudinary keys to the .env file
+

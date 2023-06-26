@@ -11,16 +11,17 @@
   },
   "devDependencies": {},
   "dependencies": {
-    "@strapi/strapi": "4.11.2",
-    "@strapi/plugin-users-permissions": "4.11.2",
     "@strapi/plugin-i18n": "4.11.2",
+    "@strapi/plugin-users-permissions": "4.11.2",
+    "@strapi/provider-upload-cloudinary": "^4.11.2",
+    "@strapi/strapi": "4.11.2",
     "pg": "8.8.0"
   },
   "author": {
     "name": "A Strapi developer"
   },
   "strapi": {
-    "uuid": "0670b2dc-a161-4b00-b75b-92f1ada4779b"
+    "uuid": "8db72255-a217-4bd8-b278-9f6ec070dc29"
   },
   "engines": {
     "node": ">=14.19.1 <=18.x.x",
