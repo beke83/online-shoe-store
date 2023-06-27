@@ -7,9 +7,11 @@ import RelatedProducts from "@/components/RelatedProducts";
 import Wrapper from "@/components/Wrapper";
 import Image from "next/image";
 import Carousel from 'react-multi-carousel';
+import { fetchDataFromApi } from "@/utils/api";
 
-export default function Home() {
-    const [modal, setModal] = useState(false)
+export default function Home({products}) {
+    // const [modal, setModal] = useState(false)
+    // console.log(products)
 
     // useEffect(() => {
     //     setTimeout(() => {
@@ -35,7 +37,7 @@ export default function Home() {
     return (
         <main>
             <HeroBanner />
-            {modal && (
+            {/* {modal && (
                 <div className="relative z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true">
                     <div className="fixed inset-0 bg-gray-500 bg-opacity-60 transition-opacity"></div>
                     <div className="fixed inset-0 z-10 overflow-y-auto">
@@ -49,7 +51,7 @@ export default function Home() {
                         </div>
                     </div>
                 </div>
-            )}
+            )} */}
 
             <Wrapper>
                 <Features />
@@ -74,13 +76,27 @@ export default function Home() {
 
                 {/* product grid start */}
                 {/* grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 my-14 px-5 md:px-0" */}
-                <div className="my-14"
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 px-5 md:px-0 my-14"
+                >
+                    {products?.data?.map((product) => (
+                        <ProductCard key={product.id} data={product}/>
+                    ))}
+                        
+                        {/* <ProductCard />
+                        <ProductCard />
+                        <ProductCard />
+                        <ProductCard />
+                        <ProductCard />
+                        <ProductCard />
+                        <ProductCard /> */}
+                </div>
+                {/* <div className="my-14"
                 >
                     <Carousel
-                    autoPlay={true}
-                    responsive={responsive}
-                    containerClass='-mx-[10px]'
-                    itemClass='px-[10px]'
+                        autoPlay={true}
+                        responsive={responsive}
+                        containerClass='-mx-[10px]'
+                        itemClass='px-[10px]'
                     >
                         <ProductCard />
                         <ProductCard />
@@ -91,10 +107,18 @@ export default function Home() {
                         <ProductCard />
                         <ProductCard />
                     </Carousel>
-                </div>
+                </div> */}
 
                 {/* product grid end */}
             </Wrapper>
         </main >
     );
+}
+
+export async function getStaticProps() {
+    const products = await fetchDataFromApi('/api/products?populate=*');
+
+    return {
+        props: { products },
+    }
 }
