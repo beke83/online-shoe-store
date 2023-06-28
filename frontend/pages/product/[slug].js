@@ -1,18 +1,26 @@
 import ProductDetailsCarousel from '@/components/ProductDetailsCarousel';
 import RelatedProducts from '@/components/RelatedProducts';
 import Wrapper from '@/components/Wrapper';
-import React from 'react';
+import { fetchDataFromApi } from '@/utils/api';
+import React, { useState } from 'react';
 import { IoMdHeartEmpty } from 'react-icons/io';
+import CurrencyFormat from 'react-currency-format';
+import { getDiscountedPricePercentage } from '@/utils/helper';
+import ReactMarkdown from 'react-markdown';
 
+const ProductDetails = ({ product, products }) => {
+    const [selectedSize, setSelectedSize] = useState();
+    const [showError, setShowError] = useState(true)
+    
+    const p = product?.data?.[0]?.attributes;
 
-const ProductDetails = () => {
     return (
         <div className='w-full md:py-20'>
             <Wrapper>
                 <div className='flex flex-col lg:flex-row md:px-10 gap-[50px] lg:gap-[100px]'>
                     {/* left column */}
                     <div className='w-full md:w-auto flex-[1.5] max-w-[500px] lg:max-w-full mx-auto lg:mx-0'>
-                        <ProductDetailsCarousel />
+                        <ProductDetailsCarousel images={p.images.data} />
                     </div>
                     {/* left column end*/}
 
@@ -20,13 +28,28 @@ const ProductDetails = () => {
                     {/* right column start*/}
                     <div className='flex-[1] py-3'>
                         <div className='text-[34px] font-semibold mb-2 text-[#fc343a]'>
-                            Jordan Retro 6 G
+                            {p.name}
                         </div>
                         <div className='text-lg font-semibold mb-5'>
-                            Men&apos;s Golf Shoes
+                            {p.subtitle}
                         </div>
-                        <div className='text-lg font-semibold'>
-                            NGN: # 40 000 .00
+                        <div className="flex items-center text-black/[0.5]">
+                            <p className="mr-2 text-lg font-semibold">
+                                <CurrencyFormat value={p.price} displayType={'text'} thousandSeparator={true} prefix={'₦'} />
+                                {/* {p.price} */}
+                            </p>
+                            {p.original_price && (
+                                <>
+                                    <p className='text-base font-medium line-through'>
+                                        ₦ {p.original_price}
+                                    </p>
+
+                                    <p className='ml-auto text-base font-medium text-green-500'>
+                                        {getDiscountedPricePercentage(p.original_price, p.price)}
+                                        % off
+                                    </p>
+                                </>
+                            )}
                         </div>
                         <div className='text-md font-semibold text-black/[0.5]'>
                             incl. of taxes
@@ -44,51 +67,50 @@ const ProductDetails = () => {
                                 </div>
                             </div>
                             {/*  sizes box start*/}
-                            <div className='grid grid-cols-3 gap-2'>
-                                <div className='border rounded-md text-center py-3 font-medium hover:border-black cursor-pointer'>
-                                    UK 6
-                                </div>
-                                <div className='border rounded-md text-center py-3 font-medium hover:border-black cursor-pointer'>
-                                    UK 6.5
-                                </div>
-                                <div className='border rounded-md text-center py-3 font-medium hover:border-black cursor-pointer'>
-                                    UK 7
-                                </div>
-                                <div className='border rounded-md text-center py-3 font-medium hover:border-black cursor-pointer'>
-                                    UK 7.5
-                                </div>
-                                <div className='border rounded-md text-center py-3 font-medium hover:border-black cursor-pointer'>
-                                    UK 8
-                                </div>
-                                <div className='border rounded-md text-center py-3 font-medium hover:border-black cursor-pointer'>
-                                    UK 8.5
-                                </div>
-                                <div className='border rounded-md text-center py-3 font-medium hover:border-black cursor-pointer'>
-                                    UK 9
-                                </div>
-                                <div className='border rounded-md text-center py-3 font-medium hover:border-black cursor-pointer'>
-                                    UK 9.5
-                                </div>
-                                <div className='border rounded-md text-center py-3 font-medium cursor-not-allowed bg-black/[0.1] opacity-50'>
-                                    UK 10
-                                </div>
-                                <div className='border rounded-md text-center py-3 font-medium  cursor-not-allowed bg-black/[0.1] opacity-50'>
-                                    UK 11
-                                </div>
+
+                            <div id="sizesGrid" className='grid grid-cols-3 gap-2'>
+                                {
+                                    p.size.data.map((item, i) => (
+                                        <div key={i}
+                                            className={`border rounded-md text-center py-3 font-medium 
+                                        ${item.enabled ?
+                                                    'hover:border-black cursor-pointer' :
+                                                    'cursor-not-allowed bg-black/[0.1] opacity-50'}
+                                        ${selectedSize === item.size ? "border-black" : ""}`}
+                                            onClick={() => {
+                                                setSelectedSize(item.size)
+                                                setShowError(false)
+                                            }}
+                                        >
+                                            {item.size}
+                                        </div>
+                                    ))
+                                }
                             </div>
                             {/*  sizes box end*/}
 
-                            {/* error message start*/}
-                            <div className='text-red-600 mt-1'>
+                            {/* showError message start*/}
+                            {showError && (<div className='text-red-600 mt-1'>
                                 Size selection is required
-                            </div>
-                            {/* error message end*/}
+                            </div>)}
+                            {/* showError message end*/}
 
                         </div>
                         {/* Product sizes end*/}
 
                         {/*  cart button start*/}
-                        <button className='w-full py-4 rounded-full bg-[#fc343a] text-white text-lg font-medium transition-transform active:scale-95 mb-3'>
+                        <button
+                            className='w-full py-4 rounded-full bg-[#fc343a] text-white text-lg font-medium transition-transform active:scale-95 mb-3'
+                            onClick={() => {
+                                if (!selectedSize) {
+                                    setShowError(true)
+                                    document.getElementById("sizesGrid").scrollIntoView({
+                                        block: "center",
+                                        behaviour: "smooth"
+                                    })
+                                }
+                            }}
+                        >
                             Add to Cart
                         </button>
                         {/*  cart button end*/}
@@ -101,21 +123,54 @@ const ProductDetails = () => {
                         {/*  wishlist button end*/}
 
                         <div>
-                            <div className='text-md mb-5'>
-                            Feel unbeatable from the tee box to the final put in design that's pure early MJ: speed class and laden with true early '90s touches like visable Air and a transclucent rubber sole that continue ti stand the test of time.
-                            </div>
-                            <div className='text-md mb-5'>
-                            Feel unbeatable from the tee box to the final put in design that's pure early MJ: speed class and laden with true early '90s touches like visable Air and a transclucent rubber sole that continue ti stand the test of time.
+                            <div className='markdown text-md mb-5'>
+                                <ReactMarkdown>
+                                    {p.description}
+                                </ReactMarkdown>
                             </div>
                         </div>
                     </div>
                     {/* right column end*/}
                 </div>
 
-                <RelatedProducts />
+                <RelatedProducts products={products} />
             </Wrapper>
         </div>
     )
 }
 
-export default ProductDetails
+export default ProductDetails;
+
+export async function getStaticPaths() {
+    //define the path for the category
+    const products = await fetchDataFromApi('/api/products?populate=*');
+
+    const paths = products.data.map((p) => ({
+        params: {
+            slug: p.attributes.slug
+        }
+    }));
+
+    return {
+        paths,
+        fallback: false
+    }
+};
+
+export async function getStaticProps({ params: { slug } }) {
+    //fetch filtered category details
+    const product = await fetchDataFromApi(`/api/products?populate=*&filters[slug][$eq]=${slug}`);
+
+    // get products by their categories
+    const products = await fetchDataFromApi(`/api/products?populate=*&[filters][slug][$ne]=${slug}`);
+
+    console.log({ filtered: products })
+
+    return {
+        props: {
+            product,
+            products,
+        }
+    }
+
+}

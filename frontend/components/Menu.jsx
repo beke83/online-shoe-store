@@ -5,10 +5,10 @@ import { BsFillCaretDownFill } from 'react-icons/bs'
 const data = [
     { id: 1, name: "Home", url: "/" },
     { id: 2, name: "Men", url: "/" },
-    { id: 2, name: "Women", url: "/" },
-    { id: 3, name: "Categories", subMenu: true },
-    { id: 3, name: "Brands", url: "/" },
-    { id: 4, name: "On Sales", url: "/" },
+    { id: 3, name: "Women", url: "/" },
+    { id: 4, name: "Categories", subMenu: true },
+    { id: 5, name: "Brands", url: "/" },
+    { id: 6, name: "On Sales", url: "/" },
 ];;
 
 const subMenuData = [
@@ -18,7 +18,7 @@ const subMenuData = [
     { id: 4, name: "Football shoes", doc_count: 107 },
 ];
 
-const Menu = ({ showCatMenu, setShowCatMenu }) => {
+const Menu = ({ showCatMenu, setShowCatMenu, categories }) => {
     return (
         <ul className='hidden md:flex items-center gap-8 font-medium text-black'>
             {
@@ -34,11 +34,14 @@ const Menu = ({ showCatMenu, setShowCatMenu }) => {
                                     <BsFillCaretDownFill size={14} />
                                     {showCatMenu && (
                                         <ul className='bg-white absolute top-6 left-0 min-w-[250px] px-1 py-1 text-black shadow-lg'>
-                                            {subMenuData.map(submenu => {
+                                            {categories?.map(({attributes: c, id}) => {
                                                 return (
-                                                    <Link key={submenu.id} href="/" onClick={() => setShowCatMenu(false)}>
-                                                        <li className='h-12 flex justify-between items-center px-3 hover:bg-black/[0.03 rounded-md '>{submenu.name}
-                                                            <span className='opacity-50 text-sm'>73</span>
+                                                    <Link key={id} href={`/category/${c.slug}`} onClick={() => setShowCatMenu(false)}>
+                                                        <li className='h-12 flex justify-between items-center px-3 hover:bg-black/[0.03 rounded-md '>
+                                                            {c.name}
+                                                            <span className='opacity-50 text-sm'>
+                                                                {`(${c.products.data.length})`}
+                                                            </span>
                                                         </li>
                                                     </Link>
                                                 )
